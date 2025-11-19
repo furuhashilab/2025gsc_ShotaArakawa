@@ -9,7 +9,7 @@ var map = new ol.Map({
 });
 
 //initial view - epsg:3857 coordinates if not "Match project CRS"
-map.getView().fit([15526453.695451, 4316232.301254, 15531938.699839, 4320246.888448], map.getSize());
+map.getView().fit([15526841.262276, 4318248.517561, 15529172.114302, 4318894.570201], map.getSize());
 
 //full zooms only
 map.getView().setProperties({constrainResolution: true});
@@ -126,33 +126,30 @@ var featureOverlay = new ol.layer.Vector({
 
 var doHighlight = false;
 var doHover = false;
-function createPopupField(currentFeature, currentFeatureKeys, layer) {
-    // ここでは QGIS のラベル設定などは無視して、
-    // Name / Photo / URL だけを使ってシンプルなポップアップHTMLを返す
 
+function createPopupField(currentFeature, currentFeatureKeys, layer) {
     var name  = currentFeature.get('Name');   // 施設名
     var photo = currentFeature.get('Photo');  // 画像URL（GitHubなど）
+    var homepage = currentFeature.get('HomePage');
     var url   = currentFeature.get('URL');    // YouTubeリンク
-
     var html = '';
-
     if (name) {
         html += '<h3>' + name + '</h3>';
     }
-
     if (photo) {
         html += '<img src="' + photo +
                 '" width="260" style="border-radius:8px; margin-bottom:6px;"><br>';
     }
-
+    if (homepage) {
+        html += '<a href="' + homepage +
+                '" target="_blank">▶ 行田おもてなし観光局ホームページ</a>';
+    }
     if (url) {
         html += '<a href="' + url +
                 '" target="_blank">▶ YouTubeで動画を見る</a>';
     }
-
     return html;
 }
-
 
 var highlight;
 var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
@@ -200,7 +197,7 @@ function onPointerMove(evt) {
                     currentFeature = clusteredFeatures[n];
                     currentFeatureKeys = currentFeature.getKeys();
                     popupText += '<li><table>'
-                    popupText += '<a>' + '<b>' + layer.get('popuplayertitle') + '</b>' + '</a>';
+                   // popupText += '<a>' + '<b>' + layer.get('popuplayertitle') + '</b>' + '</a>';
                     popupText += createPopupField(currentFeature, currentFeatureKeys, layer);
                     popupText += '</table></li>';    
                 }
@@ -209,7 +206,7 @@ function onPointerMove(evt) {
             currentFeatureKeys = currentFeature.getKeys();
             if (doPopup) {
                 popupText += '<li><table>';
-                popupText += '<a>' + '<b>' + layer.get('popuplayertitle') + '</b>' + '</a>';
+               // popupText += '<a>' + '<b>' + layer.get('popuplayertitle') + '</b>' + '</a>';
                 popupText += createPopupField(currentFeature, currentFeatureKeys, layer);
                 popupText += '</table></li>';
             }
@@ -339,7 +336,7 @@ function onSingleClickFeatures(evt) {
                         currentFeature = clusteredFeatures[n];
                         currentFeatureKeys = currentFeature.getKeys();
                         popupText += '<li><table>';
-                        popupText += '<a><b>' + layer.get('popuplayertitle') + '</b></a>';
+                       // popupText += '<a><b>' + layer.get('popuplayertitle') + '</b></a>';
                         popupText += createPopupField(currentFeature, currentFeatureKeys, layer);
                         popupText += '</table></li>';    
                     }
@@ -348,7 +345,7 @@ function onSingleClickFeatures(evt) {
                 currentFeatureKeys = currentFeature.getKeys();
                 if (doPopup) {
                     popupText += '<li><table>';
-                    popupText += '<a><b>' + layer.get('popuplayertitle') + '</b></a>';
+                   // popupText += '<a><b>' + layer.get('popuplayertitle') + '</b></a>';
                     popupText += createPopupField(currentFeature, currentFeatureKeys, layer);
                     popupText += '</table>';
                 }
@@ -455,6 +452,65 @@ var bottomRightContainerDiv = document.getElementById('bottom-right-container')
 
 //geolocate
 
+	let isTracking = false;
+
+	const geolocateButton = document.createElement('button');
+	geolocateButton.className = 'geolocate-button fa fa-map-marker';
+	geolocateButton.title = 'Geolocalizza';
+
+	const geolocateControl = document.createElement('div');
+	geolocateControl.className = 'ol-unselectable ol-control geolocate';
+	geolocateControl.appendChild(geolocateButton);
+	map.getTargetElement().appendChild(geolocateControl);
+
+	const accuracyFeature = new ol.Feature();
+	const positionFeature = new ol.Feature({
+	  style: new ol.style.Style({
+		image: new ol.style.Circle({
+		  radius: 6,
+		  fill: new ol.style.Fill({ color: '#3399CC' }),
+		  stroke: new ol.style.Stroke({ color: '#fff', width: 2 }),
+		}),
+	  }),
+	});
+
+  const geolocateOverlay = new ol.layer.Vector({
+	  source: new ol.source.Vector({
+		features: [accuracyFeature, positionFeature],
+	  }),
+	});
+	
+	const geolocation = new ol.Geolocation({
+	  projection: map.getView().getProjection(),
+	});
+
+	geolocation.on('change:accuracyGeometry', function () {
+	  accuracyFeature.setGeometry(geolocation.getAccuracyGeometry());
+	});
+
+	geolocation.on('change:position', function () {
+	  const coords = geolocation.getPosition();
+	  positionFeature.setGeometry(coords ? new ol.geom.Point(coords) : null);
+	});
+
+	geolocation.setTracking(true);
+
+	function handleGeolocate() {
+	  if (isTracking) {
+		map.removeLayer(geolocateOverlay);
+		isTracking = false;
+	  } else if (geolocation.getTracking()) {
+		map.addLayer(geolocateOverlay);
+		const pos = geolocation.getPosition();
+		if (pos) {
+		  map.getView().setCenter(pos);
+		}
+		isTracking = true;
+	  }
+	}
+
+	geolocateButton.addEventListener('click', handleGeolocate);
+	geolocateButton.addEventListener('touchstart', handleGeolocate);
 
 
 //measurement

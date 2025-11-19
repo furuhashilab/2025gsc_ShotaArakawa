@@ -11,27 +11,27 @@ var wms_layers = [];
                 url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
             })
         });
-var format__1 = new ol.format.GeoJSON();
-var features__1 = format__1.readFeatures(json__1, 
+var format_22_1 = new ol.format.GeoJSON();
+var features_22_1 = format_22_1.readFeatures(json_22_1, 
             {dataProjection: 'EPSG:4326', featureProjection: 'EPSG:3857'});
-var jsonSource__1 = new ol.source.Vector({
+var jsonSource_22_1 = new ol.source.Vector({
     attributions: ' ',
 });
-jsonSource__1.addFeatures(features__1);
-var lyr__1 = new ol.layer.Vector({
+jsonSource_22_1.addFeatures(features_22_1);
+var lyr_22_1 = new ol.layer.Vector({
                 declutter: false,
-                source:jsonSource__1, 
-                style: style__1,
-                popuplayertitle: '古代蓮の里',
+                source:jsonSource_22_1, 
+                style: style_22_1,
+                popuplayertitle: '卒論 - シート2 (2)',
                 interactive: true,
-                title: '<img src="styles/legend/_1.png" /> 古代蓮の里'
+                title: '<img src="styles/legend/22_1.png" /> 卒論 - シート2 (2)'
             });
 
-lyr_OpenStreetMap_0.setVisible(true);lyr__1.setVisible(true);
-var layersList = [lyr_OpenStreetMap_0,lyr__1];
-lyr__1.set('fieldAliases', {'Name': 'Name', 'Lat': 'Lat', 'Lon': 'Lon', 'Photo': 'Photo', 'URL': 'URL', });
-lyr__1.set('fieldImages', {'Name': 'TextEdit', 'Lat': 'TextEdit', 'Lon': 'TextEdit', 'Photo': 'TextEdit', 'URL': 'TextEdit', });
-lyr__1.set('fieldLabels', {'Name': 'no label', 'Lat': 'hidden field', 'Lon': 'hidden field', 'Photo': 'no label', 'URL': 'no label', });
-lyr__1.on('precompose', function(evt) {
+lyr_OpenStreetMap_0.setVisible(true);lyr_22_1.setVisible(true);
+var layersList = [lyr_OpenStreetMap_0,lyr_22_1];
+lyr_22_1.set('fieldAliases', {'Name': 'Name', 'Lat': 'Lat', 'Lon': 'Lon', 'Photo': 'Photo', 'HomePage': 'HomePage', 'URL': 'URL', });
+lyr_22_1.set('fieldImages', {'Name': 'TextEdit', 'Lat': 'TextEdit', 'Lon': 'TextEdit', 'Photo': 'TextEdit', 'HomePage': 'TextEdit', 'URL': 'TextEdit', });
+lyr_22_1.set('fieldLabels', {'Name': 'no label', 'Lat': 'hidden field', 'Lon': 'hidden field', 'Photo': 'no label', 'HomePage': 'no label', 'URL': 'no label', });
+lyr_22_1.on('precompose', function(evt) {
     evt.context.globalCompositeOperation = 'normal';
 });
