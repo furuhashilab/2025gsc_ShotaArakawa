@@ -2,14 +2,16 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <title>行田市 3D 観光マップ（Mapbox版）</title>
+  <title>テスト：Mapboxが動くか確認用</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Mapbox GL JS -->
+  <!-- Mapbox GL JS の CSS -->
   <link
     href="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.css"
     rel="stylesheet"
   />
+
+  <!-- Mapbox GL JS の本体 -->
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.js"></script>
 
   <style>
@@ -22,144 +24,22 @@
       width: 100%;
       height: 100%;
     }
-    .popup-content {
-      max-width: 260px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    .popup-title {
-      font-weight: 700;
-      margin-bottom: 4px;
-      font-size: 15px;
-    }
-    .popup-img {
-      width: 100%;
-      border-radius: 8px;
-      display: block;
-      margin-bottom: 6px;
-    }
-    .popup-source {
-      font-size: 11px;
-      color: #777;
-      margin-bottom: 6px;
-    }
-    .btn-link {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-      margin-right: 4px;
-    }
-    .btn-yt {
-      background: #ff0000;
-      color: #fff;
-    }
-    .btn-home {
-      background: #0f766e;
-      color: #fff;
-    }
   </style>
 </head>
 <body>
   <div id="map"></div>
 
   <script>
-    // 👉 あなたの Mapbox アクセストークン
+    // ★ ここで mapboxgl が使えるかどうかチェック
+    console.log("mapboxgl =", mapboxgl);
+
     mapboxgl.accessToken = 'pk.eyJ1Ijoic2hvdGEwOSIsImEiOiJjbWkwY3loeGswbmoxMmxxNDc1enhjNzZzIn0.7BQFeQk8Ns8kh5RGptsh4A';
 
-    // ---- 観光スポットのデータ ----
-    const spots = [
-      {
-        name: "古代蓮の里",
-        lat: 36.132689,
-        lon: 139.500927,
-        photo: "https://github.com/user-attachments/assets/5070806c-0cc9-4b82-9d26-493231496c42",
-        youtube: "https://youtu.be/dB6g8Pxy8JI?si=PPpqF2UrCZzi2yFm",
-        homepage: "https://www.city.gyoda.lg.jp/kanko/spot/kodaihasu.html",
-        source: "行田市観光協会 から引用"
-      }
-      // ここにスポットを追加
-    ];
-
-    // ---- 地図の初期化（軽めの3D設定） ----
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/light-v11',
-      center: [139.5009, 36.1326], // 行田付近
-      zoom: 14,
-      pitch: 60,   // 斜めから見せて3D感
-      bearing: -30 // 方向
-    });
-
-    // ズーム・回転コントローラー追加（操作しやすくする用）
-    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    map.on('load', () => {
-      // ---- 3D建物レイヤーだけ追加（terrain は削除） ----
-      const layers = map.getStyle().layers;
-      let labelLayerId;
-      for (let i = 0; i < layers.length; i++) {
-        if (
-          layers[i].type === 'symbol' &&
-          layers[i].layout &&
-          layers[i].layout['text-field']
-        ) {
-          labelLayerId = layers[i].id;
-          break;
-        }
-      }
-
-      map.addLayer(
-        {
-          id: '3d-buildings',
-          source: 'composite',
-          'source-layer': 'building',
-          filter: ['==', 'extrude', 'true'],
-          type: 'fill-extrusion',
-          minzoom: 15,
-          paint: {
-            'fill-extrusion-color': '#d1d5db',
-            'fill-extrusion-height': [
-              'interpolate', ['linear'], ['zoom'],
-              15, 0,
-              16, ['get', 'height']
-            ],
-            'fill-extrusion-base': ['get', 'min_height'],
-            'fill-extrusion-opacity': 0.8
-          }
-        },
-        labelLayerId
-      );
-
-      // ---- スポットをマーカーとして追加 ----
-      spots.forEach((spot) => {
-        const el = document.createElement('div');
-        el.style.width = '18px';
-        el.style.height = '18px';
-        el.style.borderRadius = '999px';
-        el.style.background = '#22c55e';
-        el.style.border = '2px solid white';
-        el.style.boxShadow = '0 0 6px rgba(0,0,0,0.25)';
-        el.style.cursor = 'pointer';
-
-        const popupHtml = `
-          <div class="popup-content">
-            <div class="popup-title">${spot.name}</div>
-            ${spot.photo ? `<img src="${spot.photo}" class="popup-img" />` : ""}
-            ${spot.source ? `<div class="popup-source">${spot.source}</div>` : ""}
-            ${spot.homepage ? `<a class="btn-link btn-home" href="${spot.homepage}" target="_blank">公式サイト</a>` : ""}
-            ${spot.youtube ? `<a class="btn-link btn-yt" href="${spot.youtube}" target="_blank">YouTubeを見る</a>` : ""}
-          </div>
-        `;
-
-        const popup = new mapboxgl.Popup({ offset: 16 }).setHTML(popupHtml);
-
-        new mapboxgl.Marker(el)
-          .setLngLat([spot.lon, spot.lat])
-          .setPopup(popup)
-          .addTo(map);
-      });
+      center: [139.5009, 36.1326],
+      zoom: 13
     });
   </script>
 </body>
