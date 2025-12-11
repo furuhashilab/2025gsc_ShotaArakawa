@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <title>行田市 観光マップ（MapLibre）</title>
+  <title>行田市 観光マップ（MapLibre + OSM）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- MapLibre -->
@@ -48,14 +48,38 @@
       homepage: "https://www.city.gyoda.lg.jp/kanko/spot/kodaihasu.html"
     };
 
-    // ◆ MapLibre 地図の作成（行田市にズーム）
+    // ◆ OSMラスタタイルを使ったスタイル
+    const osmStyle = {
+      version: 8,
+      sources: {
+        "osm-tiles": {
+          type: "raster",
+          tiles: [
+            "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          ],
+          tileSize: 256,
+          attribution: "© OpenStreetMap contributors"
+        }
+      },
+      layers: [
+        {
+          id: "osm-tiles",
+          type: "raster",
+          source: "osm-tiles",
+          minzoom: 0,
+          maxzoom: 19
+        }
+      ]
+    };
+
+    // ◆ MapLibre 地図（行田市にズーム）
     const map = new maplibregl.Map({
       container: "map",
-      style: "https://demotiles.maplibre.org/style.json",
+      style: osmStyle,               // ← ここを差し替えた！
       center: [spot.lon, spot.lat],
       zoom: 14,
-      pitch: 60,
-      bearing: -30
+      pitch: 0,                      // ラスタなので一旦2Dに
+      bearing: 0
     });
 
     map.addControl(new maplibregl.NavigationControl(), "top-right");
@@ -71,14 +95,11 @@
     `;
 
     map.on("load", () => {
-      // ◆ Popup（自動では開かない）
-      const popup = new maplibregl.Popup({ offset: 16 })
-        .setHTML(popupHtml);
+      const popup = new maplibregl.Popup({ offset: 16 }).setHTML(popupHtml);
 
-      // ◆ Marker（クリック時に popup が開く）
       new maplibregl.Marker({ color: "#22c55e" })
         .setLngLat([spot.lon, spot.lat])
-        .setPopup(popup)
+        .setPopup(popup)   // クリックしたら表示
         .addTo(map);
     });
   </script>
