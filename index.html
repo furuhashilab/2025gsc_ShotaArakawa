@@ -2,32 +2,42 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <title>Mapboxテスト</title>
+  <title>行田市 観光マップ（MapLibre）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Mapbox from UNPKG（安全・非ブロック） -->
-  <link href="https://unpkg.com/mapbox-gl@2.16.1/dist/mapbox-gl.css" rel="stylesheet" />
-  <script src="https://unpkg.com/mapbox-gl@2.16.1/dist/mapbox-gl.js"></script>
+  <!-- MapLibre -->
+  <link
+    href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css"
+    rel="stylesheet"
+  />
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
 
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; }
-    #map { width: 100%; height: 100%; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
   </style>
 </head>
 <body>
   <div id="map"></div>
 
   <script>
-    console.log("mapboxgl =", mapboxgl); // ← 動作確認用
-
-    mapboxgl.accessToken = 'pk.eyJ1Ijoic2hvdGEwOSIsImEiOiJjbWkwY3loeGswbmoxMmxxNDc1enhjNzZzIn0.7BQFeQk8Ns8kh5RGptsh4A';
-
-    const map = new mapboxgl.Map({
+    const map = new maplibregl.Map({
       container: 'map',
-      style: 'mapbox://styles/mapbox/light-v11',
+      style: 'https://demotiles.maplibre.org/style.json',
       center: [139.5009, 36.1326],
-      zoom: 13
+      zoom: 13,
+      pitch: 60,
+      bearing: -30
     });
+
+    map.addControl(new maplibregl.NavigationControl(), 'top-right');
   </script>
 </body>
 </html>
