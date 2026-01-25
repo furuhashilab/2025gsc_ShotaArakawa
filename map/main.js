@@ -225,17 +225,7 @@ const osmStyle = {
   ]
 };
 
-// ◆ MapLibre 地図（最初は行田市中心）
-const map = new maplibregl.Map({
-  container: "map",
-  style: osmStyle,
-  center: [139.48, 36.13],
-  zoom: 13,
-  pitch: 0,
-  bearing: 0
-});
 
-map.addControl(new maplibregl.NavigationControl(), "top-right");
 
 // 凡例を描画
 const legendEl = document.getElementById("legend");
