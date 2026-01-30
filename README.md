@@ -1,3 +1,6 @@
+[発表スライド](https://docs.google.com/presentation/d/1LwbaAWvQ-TiWm3LCN5wXWb7nx38irmj3Z9tJQ1RmnmI/edit?usp=sharing)
+
+[行田市動画連携型地域観光マップ](https://furuhashilab.github.io/2025gsc_ShotaArakawa/)
 # 2025gsc_ShotaArakawa
 2025ゼミ論
 ## 概要
