@@ -293,31 +293,18 @@ map.addControl(new maplibregl.NavigationControl(), "top-right");
   `).join("")}
 `;
 
-    map.on("load", () => {
-  // ===== 行田市 境界線（GeoJSON） =====
+  map.on("load", () => {
+  // 境界
   map.addSource("gyoda-boundary", {
     type: "geojson",
-    data: "/data/gyoda_geojson.geojson"   // ★拡張子つける
-  });
-
-  map.addLayer({
-    id: "gyoda-boundary-fill",
-    type: "fill",
-    source: "gyoda-boundary",
-    paint: {
-      "fill-color": "#b22222",
-      "fill-opacity": 0.00
-    }
+    data: "./data/gyoda_geojson.geojson"
   });
 
   map.addLayer({
     id: "gyoda-boundary-line",
     type: "line",
     source: "gyoda-boundary",
-    paint: {
-      "line-color": "#b22222",
-      "line-width": 5
-    }
+    paint: { "line-color": "#b22222", "line-width": 5 }
   });
   // ===== ここから下は既存のスポット処理 =====
   
@@ -348,6 +335,7 @@ map.addControl(new maplibregl.NavigationControl(), "top-right");
 
 
  
+
 
 
 
