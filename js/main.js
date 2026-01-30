@@ -270,7 +270,7 @@ function buildPopupHtml(spot) {
     // ◆ MapLibre 地図（最初は古代蓮の里を中心に）
     const map = new maplibregl.Map({
   container: "map",
-  style: "https://api.maptiler.com/maps/streets-v2/style.json?key=BgwyzYRx8xbydNv0j5mr",
+  style: osmStyle, // ← ここを MapTiler の URL から osmStyle オブジェクトに変更しました
   center: [139.48, 36.13], // 行田市中心あたり
   zoom: 13,
   pitch: 0,     // ← 3D感
@@ -344,8 +344,8 @@ map.addControl(new maplibregl.NavigationControl(), "top-right");
           .setPopup(popup)   // クリックで表示
           .addTo(map);
       });
-  
 
 
 
  
+
