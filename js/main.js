@@ -25,6 +25,43 @@ function openGoogleMapsRoute(destLat, destLon) {
   window.open(url, "_blank");
 }
 
+function toYouTubeEmbedUrl(url) {
+  if (!url) return "";
+
+  try {
+    const u = new URL(url);
+
+    // youtu.be/<id>
+    if (u.hostname === "youtu.be") {
+      const id = u.pathname.replace("/", "");
+      return id ? `https://www.youtube.com/embed/${id}` : "";
+    }
+
+    // www.youtube.com / m.youtube.com / youtube.com
+    if (u.hostname.includes("youtube.com")) {
+      // /watch?v=<id>
+      if (u.pathname === "/watch") {
+        const id = u.searchParams.get("v");
+        return id ? `https://www.youtube.com/embed/${id}` : "";
+      }
+
+      // /shorts/<id>
+      if (u.pathname.startsWith("/shorts/")) {
+        const id = u.pathname.split("/shorts/")[1]?.split("/")[0];
+        return id ? `https://www.youtube.com/embed/${id}` : "";
+      }
+
+      // /embed/<id>（すでに埋め込み）
+      if (u.pathname.startsWith("/embed/")) {
+        return u.toString();
+      }
+    }
+
+    return "";
+  } catch {
+    return "";
+  }
+}
 
 
 
@@ -33,30 +70,51 @@ function openGoogleMapsRoute(destLat, destLon) {
 function buildPopupHtml(spot) {
   const title = `<div class="popup-title">${spot.name}</div>`;
 
-  const desc = spot.desc
-    ? `<div class="popup-desc">${spot.desc}</div>`
-    : "";
+  const desc = spot.desc ? `<div class="popup-desc">${spot.desc}</div>` : "";
 
   const photo = spot.photo
     ? `<img src="${spot.photo}" class="popup-img" alt="${spot.name}" loading="lazy" />`
     : "";
 
+  // ✅ Shorts：地図上で再生
+  const shortEmbed = toYouTubeEmbedUrl(spot.youtube2);
+ const shortVideo = shortEmbed
+  ? `
+    <div class="popup-video popup-video-vertical">
+      <iframe
+        src="${shortEmbed}"
+        title="YouTube Shorts"
+        frameborder="0"
+        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+      ></iframe>
+    </div>
+  `
+  : "";
+
+
+  // ✅ Vlog（長尺）：YouTubeに遷移
+  const vlogLink = spot.youtube
+    ? `
+      <a class="popup-vlog-link"
+         href="${spot.youtube}"
+         target="_blank"
+         rel="noopener noreferrer">
+        ▶︎ YouTubeで詳しくみる
+      </a>
+    `
+    : "";
+
+  // 公式サイトなど（youtube2は埋め込みにするのでリンクには入れない）
   const links = [
     spot.homepage
       ? `<a href="${spot.homepage}" target="_blank" rel="noopener noreferrer">詳しい情報はこちら</a>`
-      : "",
-    spot.youtube
-      ? `<a href="${spot.youtube}" target="_blank" rel="noopener noreferrer">YouTubeを見る</a>`
-      : "",
-    spot.youtube2
-      ? `<a href="${spot.youtube2}" target="_blank" rel="noopener noreferrer">ショート動画を見る</a>`
       : ""
   ].filter(Boolean);
 
-  const linksHtml = links.length
-    ? `<div class="popup-links">${links.join("<br>")}</div>`
-    : "";
+  const linksHtml = links.length ? `<div class="popup-links">${links.join("<br>")}</div>` : "";
 
+  // Google Maps案内ボタン（全スポット共通でOK）
   const googleRouteBtn = `
     <button class="google-route-btn" onclick="openGoogleMapsRoute(${spot.lat}, ${spot.lon})">
       Google Mapで道案内
@@ -67,8 +125,10 @@ function buildPopupHtml(spot) {
     <div style="max-width:300px">
       ${title}
       ${desc}
+      ${shortVideo}
       ${photo}
       ${linksHtml}
+      ${vlogLink}
       ${googleRouteBtn}
     </div>
   `;
@@ -270,7 +330,7 @@ function buildPopupHtml(spot) {
     // ◆ MapLibre 地図（最初は古代蓮の里を中心に）
     const map = new maplibregl.Map({
   container: "map",
-  style: osmStyle, // ← ここを MapTiler の URL から osmStyle オブジェクトに変更しました
+  style: osmStyle,
   center: [139.48, 36.13], // 行田市中心あたり
   zoom: 13,
   pitch: 0,     // ← 3D感
@@ -293,18 +353,31 @@ map.addControl(new maplibregl.NavigationControl(), "top-right");
   `).join("")}
 `;
 
-  map.on("load", () => {
-  // 境界
+    map.on("load", () => {
+  // ===== 行田市 境界線（GeoJSON） =====
   map.addSource("gyoda-boundary", {
     type: "geojson",
-    data: "./data/gyoda_geojson.geojson"
+    data: "./gyoda_geojson.geojson"   // ★拡張子つける
+  });
+
+  map.addLayer({
+    id: "gyoda-boundary-fill",
+    type: "fill",
+    source: "gyoda-boundary",
+    paint: {
+      "fill-color": "#b22222",
+      "fill-opacity": 0.00
+    }
   });
 
   map.addLayer({
     id: "gyoda-boundary-line",
     type: "line",
     source: "gyoda-boundary",
-    paint: { "line-color": "#b22222", "line-width": 5 }
+    paint: {
+      "line-color": "#b22222",
+      "line-width": 5
+    }
   });
   // ===== ここから下は既存のスポット処理 =====
   
@@ -331,12 +404,8 @@ map.addControl(new maplibregl.NavigationControl(), "top-right");
           .setPopup(popup)   // クリックで表示
           .addTo(map);
       });
+  
 
 
 
  
-
-
-
-
-
