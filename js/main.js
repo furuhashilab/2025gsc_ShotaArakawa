@@ -357,7 +357,7 @@ map.addControl(new maplibregl.NavigationControl(), "top-right");
   // ===== 行田市 境界線（GeoJSON） =====
   map.addSource("gyoda-boundary", {
     type: "geojson",
-    data: "./gyoda_geojson.geojson"   // ★拡張子つける
+    data: "./data/gyoda_geojson.geojson"   // ★拡張子つける
   });
 
   map.addLayer({
@@ -409,3 +409,4 @@ map.addControl(new maplibregl.NavigationControl(), "top-right");
 
 
  
+
