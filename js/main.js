@@ -6,6 +6,25 @@ navigator.geolocation.getCurrentPosition(
     alert("現在地を取得できませんでした");
   }
 );
+const panelEl = document.getElementById("spot-panel");
+const panelBodyEl = document.getElementById("spot-panel-body");
+const panelCloseEl = document.getElementById("spot-panel-close");
+
+function openSpotPanel(spot){
+  if (!panelEl || !panelBodyEl) return;
+  panelBodyEl.innerHTML = buildPopupHtml(spot); // ← 今のカードHTMLをそのまま再利用
+  panelEl.classList.remove("is-hidden");
+}
+
+function closeSpotPanel(){
+  if (!panelEl) return;
+  panelEl.classList.add("is-hidden");
+  if (panelBodyEl) panelBodyEl.innerHTML = "";
+}
+
+if (panelCloseEl){
+  panelCloseEl.addEventListener("click", closeSpotPanel);
+}
 
 function openGoogleMapsRoute(destLat, destLon) {
   if (!currentLocation) {
@@ -384,29 +403,21 @@ map.addControl(new maplibregl.NavigationControl(), "top-right");
 
 });
 
-      spots.forEach((spot) => {
-        const c = CATEGORY[spot.category] ?? { label: "その他", color: "#64748b" };
+     spots.forEach((spot) => {
+  const c = CATEGORY[spot.category] ?? { label: "その他", color: "#64748b" };
 
-        const popupHtml = `
-          <div style="max-width:300px">
-            <div class="popup-title">${spot.name}</div>
-            <img src="${spot.photo}" class="popup-img" />
-            <a href="${spot.homepage}" target="_blank">公式サイトはこちら</a><br>
-            <a href="${spot.youtube}" target="_blank">YouTubeを見る</a>
-             <a href="${spot.youtube2}" target="_blank">ショート動画を見る</a>
-          </div>
-        `;
+  const marker = new maplibregl.Marker({ color: spot.color ?? c.color })
+    .setLngLat([spot.lon, spot.lat])
+    .addTo(map);
 
-        const popup = new maplibregl.Popup({ offset: 16 }).setHTML(buildPopupHtml(spot));
+  marker.getElement().addEventListener("click", (e) => {
+    e.stopPropagation();
+    openSpotPanel(spot);
+  });
+});
+map.on("click", () => closeSpotPanel());
 
-        new maplibregl.Marker({ color: spot.color??"#64748b" })
-          .setLngLat([spot.lon, spot.lat])
-          .setPopup(popup)   // クリックで表示
-          .addTo(map);
-      });
-  
 
 
 
  
-
