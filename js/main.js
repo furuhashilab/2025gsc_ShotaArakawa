@@ -191,7 +191,7 @@ function buildPopupHtml(spot) {
         category: "sightseeing",
         color: "#22c55e", 
         photo: "https://github.com/user-attachments/assets/20e5b0c6-9aa5-44d4-abd8-cbdc5765d3ee",
-        youtube2:"https://youtube.com/shorts/skSTB2O5SkI?feature=share",
+       
         homepage: "https://www.gyoda-kankoukyoukai.jp/spot/973",
         desc:"行田市の歴史を学ぶことができる博物館。そのまま忍城の中も見学できます！"
       },
@@ -421,4 +421,5 @@ map.on("click", () => closeSpotPanel());
 
 
  
+
 
